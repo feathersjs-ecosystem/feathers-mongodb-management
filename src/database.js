@@ -1,6 +1,14 @@
 import errors from 'feathers-errors';
 import filter from 'feathers-query-filters';
-import { sorter, matcher, select, _ } from 'feathers-commons';
+import { each, sorter, matcher, select, _ } from 'feathers-commons';
+
+// Helper function to process stats object
+function processStats (stats) {
+  // In Mongo the db name key is db, change to the more intuitie name just as in create
+  stats.name = stats.db;
+  delete stats.db;
+  return stats;
+}
 
 // Create the service.
 class DatabaseService {
@@ -32,6 +40,8 @@ class DatabaseService {
       return Promise.all(statsPromises);
     })
     .then(statistics => {
+      each(statistics, processStats);
+
       let values = _.values(statistics).filter(this._matcher(query));
 
       const total = values.length;

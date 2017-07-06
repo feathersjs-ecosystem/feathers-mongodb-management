@@ -35,7 +35,7 @@ describe('feathers-mongodb-management', () => {
     app.use('databases', DatabaseService({
       db: feathersDb
     }));
-    databaseService = app.service('databases')
+    databaseService = app.service('databases');
     expect(databaseService).toExist();
   });
 
@@ -54,7 +54,7 @@ describe('feathers-mongodb-management', () => {
     app.use('collections', CollectionService({
       db: testDb
     }));
-    collectionService = app.service('collections')
+    collectionService = app.service('collections');
     expect(collectionService).toExist();
   });
 
@@ -73,7 +73,7 @@ describe('feathers-mongodb-management', () => {
 
   it('finds collections', () => {
     return collectionService.find({
-      query: { $select: ['ns'] }
+      query: { $select: ['name'] }
     })
     .then(serviceCollections => {
       return testDb.collections()
@@ -85,12 +85,23 @@ describe('feathers-mongodb-management', () => {
 
   it('finds databases', () => {
     return databaseService.find({
-      query: { $select: ['db'] }
+      query: { $select: ['name'] }
     })
     .then(serviceDbs => {
       return adminDb.listDatabases()
       .then(dbsInfo => {
         expect(serviceDbs.length).to.equal(dbsInfo.databases.length);
+      });
+    });
+  });
+
+  it('removes a collection', (done) => {
+    collectionService.remove('test-collection')
+    .then(collection => {
+      // Need to use strict mode to ensure the delete operation has been taken into account
+      testDb.collection('test-collection', { strict: true }, function (err, collection) {
+        expect(err).toExist();
+        done();
       });
     });
   });
