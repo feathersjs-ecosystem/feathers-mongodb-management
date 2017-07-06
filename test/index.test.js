@@ -8,7 +8,7 @@ import DatabaseService from '../src/database';
 import CollectionService from '../src/collection';
 
 describe('feathers-mongodb-management', () => {
-  let app, feathersDb, adminDb, testDb;
+  let app, feathersDb, adminDb, testDb, databaseService, collectionService;
 
   before(() => {
     chailint(chai, util);
@@ -32,14 +32,15 @@ describe('feathers-mongodb-management', () => {
   });
 
   it('creates the database service', () => {
-    let service = app.use('databases', DatabaseService({
+    app.use('databases', DatabaseService({
       db: feathersDb
     }));
-    expect(service).toExist();
+    databaseService = app.service('databases')
+    expect(databaseService).toExist();
   });
 
   it('creates a database', () => {
-    return app.service('databases').create({
+    return databaseService.create({
       name: 'test-db'
     })
     .then(db => {
@@ -50,14 +51,15 @@ describe('feathers-mongodb-management', () => {
   });
 
   it('creates the collection service', () => {
-    let service = app.use('collections', CollectionService({
+    app.use('collections', CollectionService({
       db: testDb
     }));
-    expect(service).toExist();
+    collectionService = app.service('collections')
+    expect(collectionService).toExist();
   });
 
   it('creates a collection', () => {
-    return app.service('collections').create({
+    return collectionService.create({
       name: 'test-collection'
     })
     .then(db => {
@@ -69,8 +71,20 @@ describe('feathers-mongodb-management', () => {
     });
   });
 
+  it('finds collections', () => {
+    return collectionService.find({
+      query: { $select: ['ns'] }
+    })
+    .then(serviceCollections => {
+      return testDb.collections()
+      .then(collections => {
+        expect(serviceCollections.length).to.equal(collections.length);
+      });
+    });
+  });
+
   it('finds databases', () => {
-    return app.service('databases').find({
+    return databaseService.find({
       query: { $select: ['db'] }
     })
     .then(serviceDbs => {
