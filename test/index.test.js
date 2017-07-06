@@ -5,9 +5,10 @@ import configuration from 'feathers-configuration';
 import mongodb from 'mongodb';
 import plugin from '../src';
 import DatabaseService from '../src/database';
+import CollectionService from '../src/collection';
 
 describe('feathers-mongodb-management', () => {
-  let app, db, adminDb;
+  let app, feathersDb, adminDb, testDb;
 
   before(() => {
     chailint(chai, util);
@@ -16,8 +17,9 @@ describe('feathers-mongodb-management', () => {
     app.configure(configuration());
     return mongodb.connect(app.get('db').url)
     .then(mongo => {
-      db = mongo;
-      adminDb = db.admin();
+      feathersDb = mongo;
+      adminDb = feathersDb.admin();
+      return adminDb.listDatabases();
     });
   });
 
@@ -31,34 +33,56 @@ describe('feathers-mongodb-management', () => {
 
   it('creates the database service', () => {
     let service = app.use('databases', DatabaseService({
-      db
+      db: feathersDb
     }));
     expect(service).toExist();
   });
 
   it('creates a database', () => {
-    app.service('databases').create({
+    return app.service('databases').create({
       name: 'test-db'
     })
     .then(db => {
-      expect(db.db('test-db')).toExist();
+      testDb = feathersDb.db('test-db');
+      expect(testDb).toExist();
+      return adminDb.listDatabases();
+    });
+  });
+
+  it('creates the collection service', () => {
+    let service = app.use('collections', CollectionService({
+      db: testDb
+    }));
+    expect(service).toExist();
+  });
+
+  it('creates a collection', () => {
+    return app.service('collections').create({
+      name: 'test-collection'
+    })
+    .then(db => {
+      expect(testDb.collection('test-collection')).toExist();
+      return testDb.collections();
+    })
+    .then(collections => {
+      expect(collections.length).to.equal(1);
     });
   });
 
   it('finds databases', () => {
-    app.service('databases').find({
+    return app.service('databases').find({
       query: { $select: ['db'] }
     })
     .then(serviceDbs => {
       return adminDb.listDatabases()
-      .then(mongoDbs => {
-        expect(serviceDbs.length).to.equal(mongoDbs.length);
+      .then(dbsInfo => {
+        expect(serviceDbs.length).to.equal(dbsInfo.databases.length);
       });
     });
   });
 
   // Cleanup
   after(() => {
-    db.close();
+    feathersDb.close();
   });
 });

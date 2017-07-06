@@ -3,18 +3,13 @@ import filter from 'feathers-query-filters';
 import { sorter, matcher, select, _ } from 'feathers-commons';
 
 // Create the service.
-class DatabaseService {
+class CollectionService {
   constructor (options) {
     if (!options || !options.db) {
       throw new Error('MongoDB DB options have to be provided');
     }
 
     this.db = options.db;
-    // Use the admin database for some operations
-    this.adminDb = options.db.admin();
-    if (!this.adminDb) {
-      throw new Error('MongoDB Admin DB cannot be retrieved, ensure the connexion user has the rights to do so');
-    }
     this.paginate = options.paginate || {};
     this._matcher = options.matcher || matcher;
     this._sorter = options.sorter || sorter;
@@ -25,10 +20,10 @@ class DatabaseService {
   _find (params, getFilter = filter) {
     const { query, filters } = getFilter(params.query || {});
     // first get all DBs
-    return this.adminDb.listDatabases()
-    .then(data => {
+    return this.db.collections()
+    .then(databases => {
       // Then get stats for all DBs
-      let statsPromises = data.databases.map(databaseInfo => this.db.db(databaseInfo.name).stats());
+      let statsPromises = databases.map(database => database.stats());
       return Promise.all(statsPromises);
     })
     .then(statistics => {
@@ -77,10 +72,12 @@ class DatabaseService {
   _create (data, params) {
     let name = data.name;
     if (!name) {
-      return Promise.reject(new errors.BadRequest('Missing required name to create a database'));
+      return Promise.reject(new errors.BadRequest('Missing required name to create a collection'));
     }
 
-    return Promise.resolve(this.db.db(data.name, data))
+    // The driver complies about valid options
+    delete data.name;
+    return Promise.resolve(this.db.createCollection(name, data))
     .then(select(params));
   }
 
@@ -107,7 +104,7 @@ class DatabaseService {
 }
 
 export default function init (options) {
-  return new DatabaseService(options);
+  return new CollectionService(options);
 }
 
-init.DatabaseService = DatabaseService;
+init.CollectionService = CollectionService;
