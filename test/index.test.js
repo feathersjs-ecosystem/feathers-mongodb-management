@@ -58,16 +58,17 @@ describe('feathers-mongodb-management', () => {
     expect(collectionService).toExist();
   });
 
-  it('creates a collection', () => {
-    return collectionService.create({
+  it('creates a collection', (done) => {
+    collectionService.create({
       name: 'test-collection'
     })
-    .then(db => {
-      expect(testDb.collection('test-collection')).toExist();
-      return testDb.collections();
-    })
-    .then(collections => {
-      expect(collections.length).to.equal(1);
+    .then(collection => {
+      // Need to use strict mode to ensure the delete operation has been taken into account
+      testDb.collection('test-collection', { strict: true }, function (err, collection) {
+        expect(err).beNull();
+        expect(collection).toExist();
+        done();
+      });
     });
   });
 
