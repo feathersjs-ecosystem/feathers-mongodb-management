@@ -17,14 +17,20 @@ class Service {
     // first get all items
     return this.listImplementation()
     .then(items => {
-      // Then get stats for all items
-      let statsPromises = items.map(item => item.stats());
-      return Promise.all(statsPromises);
+      let infosPromises = items.map(item => {
+        // Then get stats/infos for all items if possible
+        if (typeof item.stats === 'function') {
+          return item.stats();
+        } else {
+          return Promise.resolve(item);
+        }
+      });
+      return Promise.all(infosPromises);
     })
-    .then(statistics => {
-      each(statistics, this.processStats);
+    .then(infos => {
+      each(infos, this.processObjectInfos);
 
-      let values = _.values(statistics).filter(this._matcher(query));
+      let values = _.values(infos).filter(this._matcher(query));
 
       const total = values.length;
 
@@ -87,33 +93,35 @@ class Service {
   }
 
   // Remove without hooks and mixins that can be used internally
-  _remove (idOrStats, params) {
-    let collection;
-    if (isObject(idOrStats)) {
-      collection = this.getImplementation(idOrStats.name);
+  _remove (idOrInfos, params) {
+    let itemPromise;
+    if (isObject(idOrInfos)) {
+      itemPromise = this.getImplementation(idOrInfos.name);
     } else {
-      collection = this.getImplementation(idOrStats);
+      itemPromise = this.getImplementation(idOrInfos);
     }
-    if (collection) {
-      return this.removeImplementation(collection)
-      .then(_ => {
-        if (isObject(idOrStats)) {
-          return idOrStats;
-        } else {
-          return { name: idOrStats };
-        }
-      });
-    }
+    return itemPromise.then(item => {
+      if (item) {
+        return this.removeImplementation(item)
+        .then(_ => {
+          if (isObject(idOrInfos)) {
+            return idOrInfos;
+          } else {
+            return { name: idOrInfos };
+          }
+        });
+      }
 
-    if (isObject(idOrStats)) {
-      return Promise.reject(
-        new errors.NotFound(`No record found for id '${idOrStats.name}'`)
-      );
-    } else {
-      return Promise.reject(
-        new errors.NotFound(`No record found for id '${idOrStats}'`)
-      );
-    }
+      if (isObject(idOrInfos)) {
+        return Promise.reject(
+          new errors.NotFound(`No record found for id '${idOrInfos.name}'`)
+        );
+      } else {
+        return Promise.reject(
+          new errors.NotFound(`No record found for id '${idOrInfos}'`)
+        );
+      }
+    });
   }
 
   remove (id, params) {

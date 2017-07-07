@@ -17,11 +17,11 @@ class DatabaseService extends Service {
   }
 
   // Helper function to process stats object
-  processStats (stats) {
-    // In Mongo the db name key is db, change to the more intuitie name just as in create
-    stats.name = stats.db;
-    delete stats.db;
-    return stats;
+  processObjectInfos (infos) {
+    // In Mongo the db name key is db, change to the more intuitive name just as in create
+    infos.name = infos.db;
+    delete infos.db;
+    return infos;
   }
 
   createImplementation (id, options) {
@@ -29,7 +29,7 @@ class DatabaseService extends Service {
   }
 
   getImplementation (id) {
-    return this.db.db(id);
+    return Promise.resolve(this.db.db(id));
   }
 
   listImplementation () {

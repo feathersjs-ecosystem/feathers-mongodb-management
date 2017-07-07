@@ -12,14 +12,14 @@ class CollectionService extends Service {
   }
 
   // Helper function to process stats object
-  processStats (stats) {
-    // In Mongo the collection name key is ns and prefixed by the db name, change to the more intuitie name just as in create
-    const namespace = stats.ns.split('.');
+  processObjectInfos (infos) {
+    // In Mongo the collection name key is ns and prefixed by the db name, change to the more intuitive name just as in create
+    const namespace = infos.ns.split('.');
     if (namespace.length > 1) {
-      stats.name = namespace[1];
+      infos.name = namespace[1];
     }
-    delete stats.ns;
-    return stats;
+    delete infos.ns;
+    return infos;
   }
 
   createImplementation (id, options) {
@@ -27,7 +27,7 @@ class CollectionService extends Service {
   }
 
   getImplementation (id) {
-    return this.db.collection(id);
+    return Promise.resolve(this.db.collection(id));
   }
 
   listImplementation () {

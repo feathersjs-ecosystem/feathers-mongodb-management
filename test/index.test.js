@@ -6,9 +6,10 @@ import mongodb from 'mongodb';
 import plugin from '../src';
 import DatabaseService from '../src/database';
 import CollectionService from '../src/collection';
+import UserService from '../src/user';
 
 describe('feathers-mongodb-management', () => {
-  let app, feathersDb, adminDb, testDb, databaseService, collectionService;
+  let app, feathersDb, adminDb, testDb, databaseService, collectionService, userService;
 
   before(() => {
     chailint(chai, util);
@@ -50,6 +51,20 @@ describe('feathers-mongodb-management', () => {
     });
   });
 
+  it('finds databases', () => {
+    return databaseService.find({
+      query: { $select: ['name', 'collections'] }
+    })
+    .then(serviceDbs => {
+      return adminDb.listDatabases()
+      .then(dbsInfo => {
+        expect(serviceDbs.length).to.equal(dbsInfo.databases.length);
+        serviceDbs.forEach(db => expect(db.collections).toExist());
+        serviceDbs.forEach(db => expect(db.objects).beUndefined());
+      });
+    });
+  });
+
   it('creates the collection service', () => {
     app.use('collections', CollectionService({
       db: testDb
@@ -86,20 +101,6 @@ describe('feathers-mongodb-management', () => {
     });
   });
 
-  it('finds databases', () => {
-    return databaseService.find({
-      query: { $select: ['name', 'collections'] }
-    })
-    .then(serviceDbs => {
-      return adminDb.listDatabases()
-      .then(dbsInfo => {
-        expect(serviceDbs.length).to.equal(dbsInfo.databases.length);
-        serviceDbs.forEach(db => expect(db.collections).toExist());
-        serviceDbs.forEach(db => expect(db.objects).beUndefined());
-      });
-    });
-  });
-
   it('removes a collection', (done) => {
     collectionService.remove('test-collection')
     .then(collection => {
@@ -107,6 +108,50 @@ describe('feathers-mongodb-management', () => {
       testDb.collection('test-collection', { strict: true }, function (err, collection) {
         expect(err).toExist();
         done();
+      });
+    });
+  });
+
+  it('creates the user service', () => {
+    app.use('users', UserService({
+      db: testDb
+    }));
+    userService = app.service('users');
+    expect(userService).toExist();
+  });
+
+  it('creates a user', () => {
+    return userService.create({
+      name: 'test-user',
+      password: 'test-password',
+      roles: [ 'readWrite' ]
+    })
+    .then(serviceUser => {
+      return testDb.command({ usersInfo: 'test-user' })
+      .then(user => {
+        expect(user).toExist();
+      });
+    });
+  });
+
+  it('finds users', () => {
+    return userService.find({
+      // query: { $select: ['name', 'count'] }
+    })
+    .then(serviceUsers => {
+      return testDb.command({ usersInfo: 1 })
+      .then(data => {
+        expect(serviceUsers.length).to.equal(data.users.length);
+      });
+    });
+  });
+
+  it('removes a user', () => {
+    return userService.remove('test-user')
+    .then(serviceUser => {
+      return testDb.command({ usersInfo: 'test-user' })
+      .then((err, user) => {
+        expect(err).toExist();
       });
     });
   });
