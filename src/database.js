@@ -1,18 +1,9 @@
-import errors from 'feathers-errors';
-import filter from 'feathers-query-filters';
-import { each, sorter, matcher, select, _ } from 'feathers-commons';
-
-// Helper function to process stats object
-function processStats (stats) {
-  // In Mongo the db name key is db, change to the more intuitie name just as in create
-  stats.name = stats.db;
-  delete stats.db;
-  return stats;
-}
+import Service from './service';
 
 // Create the service.
-class DatabaseService {
+class DatabaseService extends Service {
   constructor (options) {
+    super(options);
     if (!options || !options.db) {
       throw new Error('MongoDB DB options have to be provided');
     }
@@ -23,97 +14,35 @@ class DatabaseService {
     if (!this.adminDb) {
       throw new Error('MongoDB Admin DB cannot be retrieved, ensure the connexion user has the rights to do so');
     }
-    this.paginate = options.paginate || {};
-    this._matcher = options.matcher || matcher;
-    this._sorter = options.sorter || sorter;
   }
 
-  // Find without hooks and mixins that can be used internally and always returns
-  // a pagination object
-  _find (params, getFilter = filter) {
-    const { query, filters } = getFilter(params.query || {});
-    // first get all DBs
+  // Helper function to process stats object
+  processStats (stats) {
+    // In Mongo the db name key is db, change to the more intuitie name just as in create
+    stats.name = stats.db;
+    delete stats.db;
+    return stats;
+  }
+
+  createImplementation (id, options) {
+    return this.db.db(id, options);
+  }
+
+  getImplementation (id) {
+    return this.db.db(id);
+  }
+
+  listImplementation () {
     return this.adminDb.listDatabases()
     .then(data => {
-      // Then get stats for all DBs
-      let statsPromises = data.databases.map(databaseInfo => this.db.db(databaseInfo.name).stats());
-      return Promise.all(statsPromises);
-    })
-    .then(statistics => {
-      each(statistics, processStats);
-
-      let values = _.values(statistics).filter(this._matcher(query));
-
-      const total = values.length;
-
-      if (filters.$sort) {
-        values.sort(this._sorter(filters.$sort));
-      }
-
-      if (filters.$skip) {
-        values = values.slice(filters.$skip);
-      }
-
-      if (typeof filters.$limit !== 'undefined') {
-        values = values.slice(0, filters.$limit);
-      }
-
-      if (filters.$select) {
-        values = values.map(value => _.pick(value, ...filters.$select));
-      }
-
-      return {
-        total,
-        limit: filters.$limit,
-        skip: filters.$skip || 0,
-        data: values
-      };
+      // Get DB objects from names
+      return data.databases.map(databaseInfo => this.db.db(databaseInfo.name));
     });
   }
 
-  find (params) {
-    const paginate = typeof params.paginate !== 'undefined' ? params.paginate : this.paginate;
-    // Call the internal find with query parameter that include pagination
-    const result = this._find(params, query => filter(query, paginate));
-
-    if (!(paginate && paginate.default)) {
-      return result.then(page => page.data);
-    }
-
-    return result;
+  removeImplementation (item) {
+    return item.dropDatabase();
   }
-
-  // Create without hooks and mixins that can be used internally
-  _create (data, params) {
-    let name = data.name;
-    if (!name) {
-      return Promise.reject(new errors.BadRequest('Missing required name to create a database'));
-    }
-
-    return Promise.resolve(this.db.db(data.name, data))
-    .then(select(params));
-  }
-
-  create (data, params) {
-    if (Array.isArray(data)) {
-      return Promise.all(data.map(current => this._create(current)));
-    }
-
-    return this._create(data, params);
-  }
-  /*
-  patch (id, data, params) {
-
-  }
-
-  update (id, data, params) {
-
-  }
-
-  remove (id, params) {
-
-  }
-  */
 }
 
 export default function init (options) {

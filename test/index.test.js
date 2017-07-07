@@ -74,24 +74,28 @@ describe('feathers-mongodb-management', () => {
 
   it('finds collections', () => {
     return collectionService.find({
-      query: { $select: ['name'] }
+      query: { $select: ['name', 'count'] }
     })
     .then(serviceCollections => {
       return testDb.collections()
       .then(collections => {
         expect(serviceCollections.length).to.equal(collections.length);
+        serviceCollections.forEach(collection => expect(collection.count).toExist());
+        serviceCollections.forEach(collection => expect(collection.size).beUndefined());
       });
     });
   });
 
   it('finds databases', () => {
     return databaseService.find({
-      query: { $select: ['name'] }
+      query: { $select: ['name', 'collections'] }
     })
     .then(serviceDbs => {
       return adminDb.listDatabases()
       .then(dbsInfo => {
         expect(serviceDbs.length).to.equal(dbsInfo.databases.length);
+        serviceDbs.forEach(db => expect(db.collections).toExist());
+        serviceDbs.forEach(db => expect(db.objects).beUndefined());
       });
     });
   });
@@ -104,6 +108,13 @@ describe('feathers-mongodb-management', () => {
         expect(err).toExist();
         done();
       });
+    });
+  });
+
+  it('removes a database', () => {
+    databaseService.remove('test-db')
+    .then(db => {
+      expect(testDb.db('test-db')).beNull();
     });
   });
 
