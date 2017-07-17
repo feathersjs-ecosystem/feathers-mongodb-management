@@ -60,6 +60,7 @@ describe('feathers-mongodb-management', () => {
       .then(dbsInfo => {
         expect(serviceDbs.length).to.equal(dbsInfo.databases.length);
         serviceDbs.forEach(db => expect(db.collections).toExist());
+        // Provided by default if no $select
         serviceDbs.forEach(db => expect(db.objects).beUndefined());
       });
     });
@@ -96,6 +97,7 @@ describe('feathers-mongodb-management', () => {
       .then(collections => {
         expect(serviceCollections.length).to.equal(collections.length);
         serviceCollections.forEach(collection => expect(collection.count).toExist());
+        // Provided by default if no $select
         serviceCollections.forEach(collection => expect(collection.size).beUndefined());
       });
     });
@@ -114,6 +116,8 @@ describe('feathers-mongodb-management', () => {
 
   it('creates the user service', () => {
     app.use('users', UserService({
+      // To test fallback for Mongo <= 2.4, required by travis CI
+      hasUserInfosCommand: false,
       db: testDb
     }));
     userService = app.service('users');
@@ -136,12 +140,15 @@ describe('feathers-mongodb-management', () => {
 
   it('finds users', () => {
     return userService.find({
-      // query: { $select: ['name', 'count'] }
+      query: { $select: ['name', 'roles'] }
     })
     .then(serviceUsers => {
       return testDb.command({ usersInfo: 1 })
       .then(data => {
         expect(serviceUsers.length).to.equal(data.users.length);
+        serviceUsers.forEach(user => expect(user.name).toExist());
+        // Provided by default if no $select
+        serviceUsers.forEach(user => expect(user.db).beUndefined());
       });
     });
   });
