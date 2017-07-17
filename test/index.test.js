@@ -116,8 +116,8 @@ describe('feathers-mongodb-management', () => {
 
   it('creates the user service', () => {
     app.use('users', UserService({
-      // To test fallback for Mongo <= 2.4, required by travis CI
-      hasUserInfosCommand: false,
+      // To test fallback for Mongo <= 2.4
+      //hasUserInfosCommand: false,
       db: testDb
     }));
     userService = app.service('users');

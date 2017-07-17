@@ -32,8 +32,9 @@ class UserService extends Service {
     if (this.hasUserInfosCommand) {
       return this.db.command({ usersInfo: id })
       .then(data => data.users[0]);
-    }else {
-
+    } else {
+      return this.db.collection('system.users').find({ user: id }).toArray()
+      .then(users => users[0]);
     }
   }
 
