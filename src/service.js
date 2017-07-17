@@ -138,16 +138,12 @@ class Service {
     return this._remove(id, params);
   }
 
-  /*
+  /* NOT IMPLEMENTED
   patch (id, data, params) {
 
   }
 
   update (id, data, params) {
-
-  }
-
-  remove (id, params) {
 
   }
   */
