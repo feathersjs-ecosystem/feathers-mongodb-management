@@ -51,22 +51,21 @@ mongodb.connect('mongodb://127.0.0.1:27017/feathers-test')
   // Now create a new database
   dbService.create({ name: 'test-db' })
   .then(db => {
-    // The objects provided through the plugin services are just metadata and not the real MongoDB driver instance
-    // We need to retrieve it to create collection/user services
+    // The objects provided through the plugin services are just metadata and not MongoDB driver instances
+    // We need to retrieve it to create collection/user services that requires the DB instance
     db = mongodb.db('test-db');
     // Now create services binded to this database to manage collections/users
     app.use('/mongo/test-db/collections', plugin.collection({ db }));
     let collectionService = app.service('/mongo/test-db/collections');
     app.use('/mongo/test-db/users', plugin.user({ db }));
     let userService = app.service('/mongo/test-db/users');
-    // Perform other operations using these services
+    // Perform other operations using these services iired
     ...
+    // Then start the app
+    app.listen(3030);
+    console.log('Feathers app started on 127.0.0.1:3030');
   });
 });
-  
-app.listen(3030);
-
-console.log('Feathers app started on 127.0.0.1:3030');
 ```
 
 ## License
