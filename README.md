@@ -40,7 +40,9 @@ const app = feathers()
   .use(bodyParser.json())
   .use(bodyParser.urlencoded({ extended: true }))
   // Initialize your feathers plugin
-  .use('/plugin', plugin())
+  .use('/mongo/databases', plugin.database())
+  .use('/mongo/collections', plugin.collection())
+  .use('/mongo/users', plugin.user())
   .use(errorHandler());
 
 app.listen(3030);
