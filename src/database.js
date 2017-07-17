@@ -49,4 +49,4 @@ export default function init (options) {
   return new DatabaseService(options);
 }
 
-init.DatabaseService = DatabaseService;
+init.Service = DatabaseService;

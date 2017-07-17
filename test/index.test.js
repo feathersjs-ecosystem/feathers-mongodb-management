@@ -4,9 +4,6 @@ import feathers from 'feathers';
 import configuration from 'feathers-configuration';
 import mongodb from 'mongodb';
 import plugin from '../src';
-import DatabaseService from '../src/database';
-import CollectionService from '../src/collection';
-import UserService from '../src/user';
 
 describe('feathers-mongodb-management', () => {
   let app, feathersDb, adminDb, testDb, databaseService, collectionService, userService;
@@ -25,7 +22,13 @@ describe('feathers-mongodb-management', () => {
   });
 
   it('is CommonJS compatible', () => {
-    expect(typeof require('../lib')).to.equal('function');
+    expect(typeof plugin).to.equal('function');
+    expect(typeof plugin.database).to.equal('function');
+    expect(typeof plugin.database.Service).to.equal('function');
+    expect(typeof plugin.collection).to.equal('function');
+    expect(typeof plugin.collection.Service).to.equal('function');
+    expect(typeof plugin.user).to.equal('function');
+    expect(typeof plugin.user.Service).to.equal('function');
   });
 
   it('registers the plugin', () => {
@@ -33,7 +36,7 @@ describe('feathers-mongodb-management', () => {
   });
 
   it('creates the database service', () => {
-    app.use('databases', DatabaseService({
+    app.use('databases', plugin.database({
       db: feathersDb
     }));
     databaseService = app.service('databases');
@@ -67,7 +70,7 @@ describe('feathers-mongodb-management', () => {
   });
 
   it('creates the collection service', () => {
-    app.use('collections', CollectionService({
+    app.use('collections', plugin.collection({
       db: testDb
     }));
     collectionService = app.service('collections');
@@ -115,7 +118,7 @@ describe('feathers-mongodb-management', () => {
   });
 
   it('creates the user service', () => {
-    app.use('users', UserService({
+    app.use('users', plugin.user({
       // To test fallback for Mongo <= 2.4
       //hasUserInfosCommand: false,
       db: testDb

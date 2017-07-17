@@ -57,4 +57,4 @@ export default function init (options) {
   return new UserService(options);
 }
 
-init.UserService = UserService;
+init.Service = UserService;

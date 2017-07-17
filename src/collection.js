@@ -43,4 +43,4 @@ export default function init (options) {
   return new CollectionService(options);
 }
 
-init.CollectionService = CollectionService;
+init.Service = CollectionService;
