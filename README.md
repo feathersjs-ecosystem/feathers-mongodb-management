@@ -53,14 +53,14 @@ mongodb.connect('mongodb://127.0.0.1:27017/feathers-test')
   dbService.create({ name: 'test-db' })
   .then(db => {
     // The objects provided through the plugin services are just metadata and not MongoDB driver instances
-    // We need to retrieve it to create collection/user services that requires the DB instance
+    // We need to retrieve it to create collection/user services that require the DB instance
     db = mongodb.db('test-db');
     // Now create services binded to this database to manage collections/users
     app.use('/mongo/test-db/collections', plugin.collection({ db }));
     let collectionService = app.service('/mongo/test-db/collections');
     app.use('/mongo/test-db/users', plugin.user({ db }));
     let userService = app.service('/mongo/test-db/users');
-    // Perform other operations using these services iired
+    // Perform other operations using these services if required
     ...
     // Then start the app
     app.listen(3030);
