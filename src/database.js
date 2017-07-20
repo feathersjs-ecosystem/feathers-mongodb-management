@@ -25,7 +25,8 @@ class DatabaseService extends Service {
   }
 
   createImplementation (id, options) {
-    return this.db.db(id, options);
+    return this.db.db(id, options).stats()
+    .then(infos => this.processObjectInfos(infos));
   }
 
   getImplementation (id) {

@@ -23,7 +23,9 @@ class CollectionService extends Service {
   }
 
   createImplementation (id, options) {
-    return this.db.createCollection(id, options);
+    return this.db.createCollection(id, options)
+    .then(collection => collection.stats())
+    .then(infos => this.processObjectInfos(infos));
   }
 
   getImplementation (id) {

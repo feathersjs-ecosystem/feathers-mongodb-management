@@ -4,6 +4,9 @@ import feathers from 'feathers';
 import configuration from 'feathers-configuration';
 import mongodb from 'mongodb';
 import plugin from '../src';
+import makeDebug from 'debug';
+
+const debug = makeDebug('feathers-mongodb-management:tests')
 
 describe('feathers-mongodb-management', () => {
   let app, feathersDb, adminDb, testDb, databaseService, collectionService, userService;
@@ -48,6 +51,7 @@ describe('feathers-mongodb-management', () => {
       name: 'test-db'
     })
     .then(db => {
+      debug(db);
       testDb = feathersDb.db('test-db');
       expect(testDb).toExist();
       return adminDb.listDatabases();
@@ -59,6 +63,7 @@ describe('feathers-mongodb-management', () => {
       query: { $select: ['name', 'collections'] }
     })
     .then(serviceDbs => {
+      debug(serviceDbs);
       return adminDb.listDatabases()
       .then(dbsInfo => {
         expect(serviceDbs.length).to.equal(dbsInfo.databases.length);
@@ -82,6 +87,7 @@ describe('feathers-mongodb-management', () => {
       name: 'test-collection'
     })
     .then(collection => {
+      debug(collection);
       // Need to use strict mode to ensure the delete operation has been taken into account
       testDb.collection('test-collection', { strict: true }, function (err, collection) {
         expect(err).beNull();
@@ -96,6 +102,7 @@ describe('feathers-mongodb-management', () => {
       query: { $select: ['name', 'count'] }
     })
     .then(serviceCollections => {
+      debug(serviceCollections);
       return testDb.collections()
       .then(collections => {
         expect(serviceCollections.length).to.equal(collections.length);
@@ -109,6 +116,7 @@ describe('feathers-mongodb-management', () => {
   it('removes a collection', (done) => {
     collectionService.remove('test-collection')
     .then(collection => {
+      debug(collection);
       // Need to use strict mode to ensure the delete operation has been taken into account
       testDb.collection('test-collection', { strict: true }, function (err, collection) {
         expect(err).toExist();
@@ -134,6 +142,7 @@ describe('feathers-mongodb-management', () => {
       roles: [ 'readWrite' ]
     })
     .then(serviceUser => {
+      debug(serviceUser);
       return testDb.command({ usersInfo: 'test-user' })
       .then(user => {
         expect(user).toExist();
@@ -146,6 +155,7 @@ describe('feathers-mongodb-management', () => {
       query: { $select: ['name', 'roles'] }
     })
     .then(serviceUsers => {
+      debug(serviceUsers);
       return testDb.command({ usersInfo: 1 })
       .then(data => {
         expect(serviceUsers.length).to.equal(data.users.length);
@@ -159,6 +169,7 @@ describe('feathers-mongodb-management', () => {
   it('removes a user', () => {
     return userService.remove('test-user')
     .then(serviceUser => {
+      debug(serviceUser);
       return testDb.command({ usersInfo: 'test-user' })
       .then((err, user) => {
         expect(err).toExist();
@@ -169,6 +180,7 @@ describe('feathers-mongodb-management', () => {
   it('removes a database', () => {
     databaseService.remove('test-db')
     .then(db => {
+      debug(db);
       expect(testDb.db('test-db')).beNull();
     });
   });
