@@ -8,9 +8,10 @@
 [![Dependency Status](https://img.shields.io/david/feathersjs/feathers-mongodb-management.svg?style=flat-square)](https://david-dm.org/feathersjs/feathers-mongodb-management)
 [![Download Status](https://img.shields.io/npm/dm/feathers-mongodb-management.svg?style=flat-square)](https://www.npmjs.com/package/feathers-mongodb-management)
 
-> Feathers service adapters for managing MongoDB databases and collections
+> Feathers service adapters for managing MongoDB databases, users and collections
 
-## Not yet ready for use
+**This plugin is under heavy development, updates will be pushed frequently.
+As a consequence it should be considered unstable, not yet ready for production use.**
 
 ## Installation
 
@@ -32,6 +33,7 @@ const rest = require('feathers-rest');
 const hooks = require('feathers-hooks');
 const bodyParser = require('body-parser');
 const errorHandler = require('feathers-errors/handler');
+const mongodb = require('mongodb');
 const plugin = require('feathers-mongodb-management');
 
 // Initialize the application
@@ -41,13 +43,32 @@ const app = feathers()
   // Needed for parsing bodies (login)
   .use(bodyParser.json())
   .use(bodyParser.urlencoded({ extended: true }))
-  // Initialize your feathers plugin
-  .use('/plugin', plugin())
   .use(errorHandler());
 
-app.listen(3030);
-
-console.log('Feathers app started on 127.0.0.1:3030');
+// Connect to Mongo instance
+mongodb.connect('mongodb://127.0.0.1:27017/feathers-test')
+.then(mongo => {
+  // Initialize your feathers plugin to manage databases
+  app.use('/mongo/databases', plugin.database({ db: mongo }));
+  let dbService = app.service('/mongo/databases');
+  // Now create a new database
+  dbService.create({ name: 'test-db' })
+  .then(db => {
+    // The objects provided through the plugin services are just metadata and not MongoDB driver instances
+    // We need to retrieve it to create collection/user services that require the DB instance
+    db = mongodb.db('test-db');
+    // Now create services binded to this database to manage collections/users
+    app.use('/mongo/test-db/collections', plugin.collection({ db }));
+    let collectionService = app.service('/mongo/test-db/collections');
+    app.use('/mongo/test-db/users', plugin.user({ db }));
+    let userService = app.service('/mongo/test-db/users');
+    // Perform other operations using these services if required
+    ...
+    // Then start the app
+    app.listen(3030);
+    console.log('Feathers app started on 127.0.0.1:3030');
+  });
+});
 ```
 
 ## License
