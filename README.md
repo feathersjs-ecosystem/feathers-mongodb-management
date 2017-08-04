@@ -8,7 +8,7 @@
 
 > Feathers service adapters for managing MongoDB databases, users and collections
 
-**This plugin is under heavy development, updates will be pushed frequently.
+**This plugin is under alpha-testing, breaking changes could be pushed unexpectedly.
 As a consequence it should be considered unstable, not yet ready for production use.**
 
 ## Installation
