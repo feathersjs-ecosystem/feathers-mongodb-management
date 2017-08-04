@@ -6,7 +6,7 @@ import mongodb from 'mongodb';
 import plugin from '../src';
 import makeDebug from 'debug';
 
-const debug = makeDebug('feathers-mongodb-management:tests')
+const debug = makeDebug('feathers-mongodb-management:tests');
 
 describe('feathers-mongodb-management', () => {
   let app, feathersDb, adminDb, testDb, databaseService, collectionService, userService;
@@ -128,7 +128,7 @@ describe('feathers-mongodb-management', () => {
   it('creates the user service', () => {
     app.use('users', plugin.user({
       // To test fallback for Mongo <= 2.4
-      //hasUserInfosCommand: false,
+      // hasUserInfosCommand: false,
       db: testDb
     }));
     userService = app.service('users');
