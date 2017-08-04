@@ -1,6 +1,6 @@
 import database from './database';
 import collection from './collection';
-import user from './user'; 
+import user from './user';
 import makeDebug from 'debug';
 
 const debug = makeDebug('feathers-mongodb-management');
