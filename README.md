@@ -8,18 +8,23 @@
 
 > Feathers service adapters for managing MongoDB databases, users and collections
 
-**This plugin is under alpha-testing, breaking changes could be pushed unexpectedly.
-As a consequence it should be considered unstable, not yet ready for production use.**
+### Under Development
+
+**This plugin is under development and currently in beta-test, updates will be pushed frequently.
+As a consequence it should be considered unstable, not yet ready for production use.
+Although we try to avoid this wherever possible, `0.x` versions on the master branch can promote breaking changes in the API.**
 
 ## Installation
 
-```
-npm install feathers-mongodb-management --save
-```
+With NPM `npm install feathers-mongodb-management --save` or Yarn `yarn add feathers-mongodb-management`
 
 ## Documentation
 
-If a large number of users require it a more complete feathers-mongodb-management documentation will be created. For now as the API is pretty straigth forward the example and [tests](https://github.com/feathersjs-ecosystem/feathers-mongodb-management/tree/master/test) should be sufficient.
+If a large number of users require it a more complete feathers-mongodb-management documentation will be created. For now as the API is pretty straigth forward the example and [tests](https://github.com/feathersjs-ecosystem/feathers-mongodb-management/tree/master/test) should be sufficient to understand how it works.
+
+The initial use case was to simplify data segregation for a SaaS application where each user could belong to different organisations like in GitHub. Indeed, one key aspect of access control is to filter the resources a user can reach. In this specific use case the users always work in the context of an organisation acting as a filter applied on the manipulated resources. This issue is often tackled by applying a client-side filter on a global service like `/users?org=orgId` and storing on each resouce the organisation it belongs to. We consider this approach as more harder to maintain in the long-term due to additional filtering and relations in the data model. As a consequence we created this plugin to "physically" separate the data of each organisation in a dedicated DB instead of doing this "logically" using filtering.
+
+You can find more information by reading this [article](https://blog.feathersjs.com/access-control-strategies-with-feathersjs-72452268739d).
 
 ## Complete Example
 
