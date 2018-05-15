@@ -19,9 +19,7 @@ npm install feathers-mongodb-management --save
 
 ## Documentation
 
-**TODO**
-
-Please wait for the [feathers-mongodb-management documentation](http://docs.feathersjs.com/).
+If a large number of users require it a more complete feathers-mongodb-management documentation will be created. For now as the API is pretty straigth forward the example and [tests](https://github.com/feathersjs-ecosystem/feathers-mongodb-management/tree/master/test) should be sufficient.
 
 ## Complete Example
 
