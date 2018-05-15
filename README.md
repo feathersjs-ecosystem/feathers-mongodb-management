@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/feathersjs-ecosystem/feathers-mongodb-management.png?branch=master)](https://travis-ci.org/feathersjs-ecosystem/feathers-mongodb-management)
 [![Code Climate](https://codeclimate.com/github/feathersjs/feathers-mongodb-management/badges/gpa.svg)](https://codeclimate.com/github/feathersjs-ecosystem/feathers-mongodb-management)
 [![Test Coverage](https://codeclimate.com/github/feathersjs/feathers-mongodb-management/badges/coverage.svg)](https://codeclimate.com/github/feathersjs-ecosystem/feathers-mongodb-management/coverage)
+[![Known Vulnerabilities](https://snyk.io/test/github/feathersjs-ecosystem/feathers-mongodb-management/badge.svg)](https://snyk.io/test/github/feathersjs-ecosystem/feathers-mongodb-management)
 [![Dependency Status](https://img.shields.io/david/feathersjs-ecosystem/feathers-mongodb-management.svg?style=flat-square)](https://david-dm.org/feathersjs-ecosystem/feathers-mongodb-management)
 [![Download Status](https://img.shields.io/npm/dm/feathers-mongodb-management.svg?style=flat-square)](https://www.npmjs.com/package/feathers-mongodb-management)
 
