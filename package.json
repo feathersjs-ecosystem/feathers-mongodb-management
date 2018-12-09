@@ -50,8 +50,8 @@
     "lib": "lib"
   },
   "dependencies": {
-    "debug": "^3.1.0",
-    "feathers": "^2.1.4",
+    "debug": "^2.6.9",
+    "feathers": "^2.2.4",
     "feathers-commons": "^0.8.7",
     "feathers-errors": "^2.8.1",
     "feathers-query-filters": "^2.1.2"
