@@ -2,26 +2,31 @@ import chai, { util, expect } from 'chai';
 import chailint from 'chai-lint';
 import feathers from 'feathers';
 import configuration from 'feathers-configuration';
-import mongodb from 'mongodb';
+import MongoClient from 'mongodb';
 import plugin from '../src';
 import makeDebug from 'debug';
 
 const debug = makeDebug('feathers-mongodb-management:tests');
 
 describe('feathers-mongodb-management', () => {
-  let app, feathersDb, adminDb, testDb, databaseService, collectionService, userService;
+  let app, client, feathersDb, adminDb, testDb, databaseService, collectionService, userService;
 
-  before(() => {
+  before(async () => {
     chailint(chai, util);
     app = feathers();
     // Load app configuration first
     app.configure(configuration());
-    return mongodb.connect(app.get('db').url)
-    .then(mongo => {
-      feathersDb = mongo;
-      adminDb = feathersDb.admin();
-      return adminDb.listDatabases();
-    });
+    const url = app.get('db').url;
+    client = await MongoClient.connect(url);
+    // Extract database name.  Need to remove the connections options if any
+    let dbName;
+    const indexOfDBName = url.lastIndexOf('/') + 1;
+    const indexOfOptions = url.indexOf('?');
+    if (indexOfOptions === -1) dbName = url.substring(indexOfDBName);
+    else dbName = url.substring(indexOfDBName, indexOfOptions);
+    feathersDb = client.db(dbName);
+    adminDb = feathersDb.admin();
+    await adminDb.listDatabases();
   });
 
   it('is CommonJS compatible', () => {
@@ -40,38 +45,32 @@ describe('feathers-mongodb-management', () => {
 
   it('creates the database service', () => {
     app.use('databases', plugin.database({
-      db: feathersDb
+      db: feathersDb,
+      client
     }));
     databaseService = app.service('databases');
     expect(databaseService).toExist();
   });
 
-  it('creates a database', () => {
-    return databaseService.create({
+  it('creates a database', async () => {
+    const db = await databaseService.create({
       name: 'test-db'
-    })
-    .then(db => {
-      debug(db);
-      testDb = feathersDb.db('test-db');
-      expect(testDb).toExist();
-      return adminDb.listDatabases();
     });
+    debug(db);
+    testDb = client.db('test-db');
+    expect(testDb).toExist();
   });
 
-  it('finds databases', () => {
-    return databaseService.find({
+  it('finds databases', async () => {
+    const serviceDbs = await databaseService.find({
       query: { $select: ['name', 'collections'] }
-    })
-    .then(serviceDbs => {
-      debug(serviceDbs);
-      return adminDb.listDatabases()
-      .then(dbsInfo => {
-        expect(serviceDbs.length).to.equal(dbsInfo.databases.length);
-        serviceDbs.forEach(db => expect(db.collections).toExist());
-        // Provided by default if no $select
-        serviceDbs.forEach(db => expect(db.objects).beUndefined());
-      });
     });
+    debug(serviceDbs);
+    const dbsInfo = await adminDb.listDatabases();
+    expect(serviceDbs.length).to.equal(dbsInfo.databases.length);
+    serviceDbs.forEach(db => expect(db.collections).toExist());
+    // Provided by default if no $select
+    serviceDbs.forEach(db => expect(db.objects).beUndefined());
   });
 
   it('creates the collection service', () => {
@@ -86,43 +85,39 @@ describe('feathers-mongodb-management', () => {
     collectionService.create({
       name: 'test-collection'
     })
-    .then(collection => {
-      debug(collection);
-      // Need to use strict mode to ensure the delete operation has been taken into account
-      testDb.collection('test-collection', { strict: true }, function (err, collection) {
-        expect(err).beNull();
-        expect(collection).toExist();
-        done();
+      .then(collection => {
+        debug(collection);
+        // Need to use strict mode to ensure the delete operation has been taken into account
+        testDb.collection('test-collection', { strict: true }, function (err, collection) {
+          expect(err).beNull();
+          expect(collection).toExist();
+          done();
+        });
       });
-    });
   });
 
-  it('finds collections', () => {
-    return collectionService.find({
+  it('finds collections', async () => {
+    const serviceCollections = await collectionService.find({
       query: { $select: ['name', 'count'] }
-    })
-    .then(serviceCollections => {
-      debug(serviceCollections);
-      return testDb.collections()
-      .then(collections => {
-        expect(serviceCollections.length).to.equal(collections.length);
-        serviceCollections.forEach(collection => expect(collection.count).toExist());
-        // Provided by default if no $select
-        serviceCollections.forEach(collection => expect(collection.size).beUndefined());
-      });
     });
+    debug(serviceCollections);
+    const collections = await testDb.collections();
+    expect(serviceCollections.length).to.equal(collections.length);
+    serviceCollections.forEach(collection => expect(collection.count).toExist());
+    // Provided by default if no $select
+    serviceCollections.forEach(collection => expect(collection.size).beUndefined());
   });
 
   it('removes a collection', (done) => {
     collectionService.remove('test-collection')
-    .then(collection => {
-      debug(collection);
-      // Need to use strict mode to ensure the delete operation has been taken into account
-      testDb.collection('test-collection', { strict: true }, function (err, collection) {
-        expect(err).toExist();
-        done();
+      .then(collection => {
+        debug(collection);
+        // Need to use strict mode to ensure the delete operation has been taken into account
+        testDb.collection('test-collection', { strict: true }, function (err, collection) {
+          expect(err).toExist();
+          done();
+        });
       });
-    });
   });
 
   it('creates the user service', () => {
@@ -135,58 +130,48 @@ describe('feathers-mongodb-management', () => {
     expect(userService).toExist();
   });
 
-  it('creates a user', () => {
-    return userService.create({
+  it('creates a user', async () => {
+    const serviceUser = await userService.create({
       name: 'test-user',
       password: 'test-password',
-      roles: [ 'readWrite' ]
-    })
-    .then(serviceUser => {
-      debug(serviceUser);
-      return testDb.command({ usersInfo: 'test-user' })
-      .then(user => {
-        expect(user).toExist();
-      });
+      roles: ['readWrite']
     });
+    debug(serviceUser);
+    const user = await testDb.command({ usersInfo: 'test-user' });
+    expect(user).toExist();
   });
 
-  it('finds users', () => {
-    return userService.find({
+  it('finds users', async () => {
+    const serviceUsers = await userService.find({
       query: { $select: ['name', 'roles'] }
-    })
-    .then(serviceUsers => {
-      debug(serviceUsers);
-      return testDb.command({ usersInfo: 1 })
-      .then(data => {
-        expect(serviceUsers.length).to.equal(data.users.length);
-        serviceUsers.forEach(user => expect(user.name).toExist());
-        // Provided by default if no $select
-        serviceUsers.forEach(user => expect(user.db).beUndefined());
-      });
     });
+    debug(serviceUsers);
+    const data = await testDb.command({ usersInfo: 1 });
+    expect(serviceUsers.length).to.equal(data.users.length);
+    serviceUsers.forEach(user => expect(user.name).toExist());
+    // Provided by default if no $select
+    serviceUsers.forEach(user => expect(user.db).beUndefined());
   });
 
-  it('removes a user', () => {
-    return userService.remove('test-user')
-    .then(serviceUser => {
-      debug(serviceUser);
-      return testDb.command({ usersInfo: 'test-user' })
-      .then((err, user) => {
-        expect(err).toExist();
-      });
-    });
+  it('removes a user', async () => {
+    const serviceUser = await userService.remove('test-user');
+    debug(serviceUser);
+    try {
+      await testDb.command({ usersInfo: 'test-user' });
+    } catch (error) {
+      expect(error).toExist();
+    }
   });
 
-  it('removes a database', () => {
-    databaseService.remove('test-db')
-    .then(db => {
-      debug(db);
-      expect(testDb.db('test-db')).beNull();
-    });
+  it('removes a database', async () => {
+    const db = await databaseService.remove('test-db');
+    debug(db);
+    const dbsInfo = await adminDb.listDatabases();
+    expect(dbsInfo.databases.find(item => item.name === 'test-db')).beUndefined();
   });
 
   // Cleanup
   after(() => {
-    feathersDb.close();
+    client.close();
   });
 });

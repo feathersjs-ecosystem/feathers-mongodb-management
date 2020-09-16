@@ -4,11 +4,12 @@ import Service from './service';
 class DatabaseService extends Service {
   constructor (options) {
     super(options);
-    if (!options || !options.db) {
+    if (!options || !options.db || !options.client) {
       throw new Error('MongoDB DB options have to be provided');
     }
 
     this.db = options.db;
+    this.client = options.client;
     // Use the admin database for some operations
     this.adminDb = options.db.admin();
     if (!this.adminDb) {
@@ -24,25 +25,23 @@ class DatabaseService extends Service {
     return infos;
   }
 
-  createImplementation (id, options) {
-    return this.db.db(id, options).stats()
-    .then(infos => this.processObjectInfos(infos));
+  async createImplementation (id, options) {
+    return this.client.db(id, options).stats()
+      .then(infos => this.processObjectInfos(infos));
   }
 
-  getImplementation (id) {
-    return Promise.resolve(this.db.db(id));
+  async getImplementation (id) {
+    return Promise.resolve(this.client.db(id));
   }
 
-  listImplementation () {
-    return this.adminDb.listDatabases()
-    .then(data => {
-      // Get DB objects from names
-      return data.databases.map(databaseInfo => this.db.db(databaseInfo.name));
-    });
+  async listImplementation () {
+    const data = await this.adminDb.listDatabases();
+    // Get DB objects from names
+    return data.databases.map(databaseInfo => this.client.db(databaseInfo.name));
   }
 
-  removeImplementation (item) {
-    return item.dropDatabase();
+  async removeImplementation (item) {
+    await item.dropDatabase();
   }
 }
 

@@ -31,20 +31,20 @@ class UserService extends Service {
   getImplementation (id) {
     if (this.hasUserInfosCommand) {
       return this.db.command({ usersInfo: id })
-      .then(data => data.users[0]);
+        .then(data => data.users[0]);
     } else {
       return this.db.collection('system.users').find({ user: id }).toArray()
-      .then(users => users[0]);
+        .then(users => users[0]);
     }
   }
 
   listImplementation () {
     if (this.hasUserInfosCommand) {
       return this.db.command({ usersInfo: 1 })
-      .then(data => data.users);
+        .then(data => data.users);
     } else {
       return this.db.collection('system.users').find().toArray()
-      .then(users => users);
+        .then(users => users);
     }
   }
 
