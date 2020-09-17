@@ -1,7 +1,7 @@
 {
   "name": "feathers-mongodb-management",
   "description": "Feathers service adapters for managing MongoDB databases, collections and users",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "homepage": "https://github.com/feathers-plus/feathers-mongodb-management",
   "main": "lib/",
   "keywords": [
