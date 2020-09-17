@@ -4,17 +4,14 @@ import Service from './service';
 class DatabaseService extends Service {
   constructor (options) {
     super(options);
-    if (!options || !options.db || !options.client) {
-      throw new Error('MongoDB DB options have to be provided');
+    if (!options || !options.adminDb || !options.client) {
+      throw new Error('Database service options (admin DB and DB client) have to be provided');
     }
 
-    this.db = options.db;
-    this.client = options.client;
     // Use the admin database for some operations
-    this.adminDb = options.db.admin();
-    if (!this.adminDb) {
-      throw new Error('MongoDB Admin DB cannot be retrieved, ensure the connexion user has the rights to do so');
-    }
+    this.adminDb = options.adminDb;
+    // And the client for some others
+    this.client = options.client;
   }
 
   // Helper function to process stats object

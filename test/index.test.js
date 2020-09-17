@@ -9,7 +9,7 @@ import makeDebug from 'debug';
 const debug = makeDebug('feathers-mongodb-management:tests');
 
 describe('feathers-mongodb-management', () => {
-  let app, client, feathersDb, adminDb, testDb, databaseService, collectionService, userService;
+  let app, client, adminDb, testDb, databaseService, collectionService, userService;
 
   before(async () => {
     chailint(chai, util);
@@ -18,14 +18,7 @@ describe('feathers-mongodb-management', () => {
     app.configure(configuration());
     const url = app.get('db').url;
     client = await MongoClient.connect(url);
-    // Extract database name.  Need to remove the connections options if any
-    let dbName;
-    const indexOfDBName = url.lastIndexOf('/') + 1;
-    const indexOfOptions = url.indexOf('?');
-    if (indexOfOptions === -1) dbName = url.substring(indexOfDBName);
-    else dbName = url.substring(indexOfDBName, indexOfOptions);
-    feathersDb = client.db(dbName);
-    adminDb = feathersDb.admin();
+    adminDb = client.db('feathers-test').admin();
     await adminDb.listDatabases();
   });
 
@@ -45,8 +38,7 @@ describe('feathers-mongodb-management', () => {
 
   it('creates the database service', () => {
     app.use('databases', plugin.database({
-      db: feathersDb,
-      client
+      adminDb, client
     }));
     databaseService = app.service('databases');
     expect(databaseService).toExist();

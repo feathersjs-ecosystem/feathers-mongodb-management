@@ -50,20 +50,22 @@ const app = feathers()
   .use(errorHandler());
 
 // Connect to Mongo instance
-const client = await mongodb.MongoClient.connect('mongodb://127.0.0.1:27017/feathers-test')
+const client = await mongodb.MongoClient.connect('mongodb://127.0.0.1:27017')
 // Initialize your feathers plugin to manage databases
-app.use('/mongo/databases', plugin.database({ db: client.db('feathers-test'), client }));
+app.use('/mongo/databases', plugin.database({ adminDb: client.db('feathers-test').admin(), client }));
 let dbService = app.service('/mongo/databases');
 // Now create a new database
-const db = await dbService.create({ name: 'test-db' })
+let db = await dbService.create({ name: 'test-db' })
 // The objects provided through the plugin services are just metadata and not MongoDB driver instances
 // We need to retrieve it to create collection/user services that require the DB instance
 db = client.db('test-db');
 // Now create services binded to this database to manage collections/users
 app.use('/mongo/test-db/collections', plugin.collection({ db }));
 let collectionService = app.service('/mongo/test-db/collections');
+const collection = await collectionService.create({ name: 'test-collection' })
 app.use('/mongo/test-db/users', plugin.user({ db }));
 let userService = app.service('/mongo/test-db/users');
+const user = await userService.create({ name: 'test-user', password: 'test-password', roles: ['readWrite'] })
 // Perform other operations using these services if required
 ...
 // Then start the app

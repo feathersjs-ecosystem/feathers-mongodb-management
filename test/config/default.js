@@ -8,6 +8,6 @@ module.exports = {
     max: 50
   },
   db: {
-    url: (containerized ? 'mongodb://mongodb:27017/feathers-test' : 'mongodb://127.0.0.1:27017/feathers-test')
+    url: (containerized ? 'mongodb://mongodb:27017' : 'mongodb://127.0.0.1:27017')
   }
 };
