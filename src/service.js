@@ -1,6 +1,7 @@
-import errors from 'feathers-errors';
-import filter from 'feathers-query-filters';
-import { isObject, each, sorter, matcher, select, _ } from 'feathers-commons';
+import errors from '@feathersjs/errors';
+import matcher from 'sift';
+import { filterQuery, sorter, select } from '@feathersjs/adapter-commons';
+import { _ } from '@feathersjs/commons';
 
 // Create the base service.
 class Service {
@@ -12,7 +13,7 @@ class Service {
 
   // Find without hooks and mixins that can be used internally and always returns
   // a pagination object
-  async _find (params, getFilter = filter) {
+  async _find (params, getFilter = filterQuery) {
     const { query, filters } = getFilter(params.query || {});
     // first get all items
     const items = await this.listImplementation();
@@ -25,7 +26,7 @@ class Service {
       }
     });
     const infos = await Promise.all(infosPromises);
-    each(infos, this.processObjectInfos);
+    _.each(infos, this.processObjectInfos);
 
     let values = _.values(infos).filter(this._matcher(query));
 
@@ -58,7 +59,7 @@ class Service {
   async find (params) {
     const paginate = typeof params.paginate !== 'undefined' ? params.paginate : this.paginate;
     // Call the internal find with query parameter that include pagination
-    const result = await this._find(params, query => filter(query, paginate));
+    const result = await this._find(params, query => filterQuery(query, paginate));
 
     if (!(paginate && paginate.default)) {
       return result.data;
@@ -91,7 +92,7 @@ class Service {
   // Remove without hooks and mixins that can be used internally
   async _remove (idOrInfos, params) {
     let item;
-    if (isObject(idOrInfos)) {
+    if (_.isObject(idOrInfos)) {
       item = await this.getImplementation(idOrInfos.name);
     } else {
       item = await this.getImplementation(idOrInfos);
@@ -99,14 +100,14 @@ class Service {
 
     if (item) {
       await this.removeImplementation(item);
-      if (isObject(idOrInfos)) {
+      if (_.isObject(idOrInfos)) {
         return idOrInfos;
       } else {
         return { name: idOrInfos };
       }
     }
 
-    if (isObject(idOrInfos)) {
+    if (_.isObject(idOrInfos)) {
       throw new errors.NotFound(`No record found for id '${idOrInfos.name}'`);
     } else {
       throw new errors.NotFound(`No record found for id '${idOrInfos}'`);

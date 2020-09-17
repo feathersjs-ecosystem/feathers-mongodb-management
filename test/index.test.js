@@ -1,7 +1,7 @@
 import chai, { util, expect } from 'chai';
 import chailint from 'chai-lint';
-import feathers from 'feathers';
-import configuration from 'feathers-configuration';
+import feathers from '@feathersjs/feathers';
+import configuration from '@feathersjs/configuration';
 import MongoClient from 'mongodb';
 import plugin from '../src';
 import makeDebug from 'debug';
