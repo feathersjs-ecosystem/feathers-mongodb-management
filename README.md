@@ -1,10 +1,9 @@
 # feathers-mongodb-management
 
-[![Build Status](https://travis-ci.org/feathers-plus/feathers-mongodb-management.png?branch=master)](https://travis-ci.org/feathersjs-plus/feathers-mongodb-management)
-[![Code Climate](https://codeclimate.com/github/feathers-plus/feathers-mongodb-management/badges/gpa.svg)](https://codeclimate.com/github/feathersjs-plus/feathers-mongodb-management)
-[![Test Coverage](https://codeclimate.com/github/feathers-plus/feathers-mongodb-management/badges/coverage.svg)](https://codeclimate.com/github/feathersjs-plus/feathers-mongodb-management/coverage)
-[![Known Vulnerabilities](https://snyk.io/test/github/feathersjs-plus/feathers-mongodb-management/badge.svg)](https://snyk.io/test/github/feathersjs-plus/feathers-mongodb-management)
-[![Dependency Status](https://img.shields.io/david/feathersjs-plus/feathers-mongodb-management.svg?style=flat-square)](https://david-dm.org/feathersjs-plus/feathers-mongodb-management)
+[![Build Status](https://travis-ci.org/feathers-plus/feathers-mongodb-management.png?branch=master)](https://travis-ci.org/feathers-plus/feathers-mongodb-management)
+[![Code Climate](https://codeclimate.com/github/feathers-plus/feathers-mongodb-management/badges/gpa.svg)](https://codeclimate.com/github/feathers-plus/feathers-mongodb-management)
+[![Test Coverage](https://codeclimate.com/github/feathers-plus/feathers-mongodb-management/badges/coverage.svg)](https://codeclimate.com/github/feathers-plus/feathers-mongodb-management/coverage)
+[![Dependency Status](https://img.shields.io/david/feathers-plus/feathers-mongodb-management.svg?style=flat-square)](https://david-dm.org/feathers-plus/feathers-mongodb-management)
 [![Download Status](https://img.shields.io/npm/dm/feathers-mongodb-management.svg?style=flat-square)](https://www.npmjs.com/package/feathers-mongodb-management)
 
 > Feathers service adapters for managing MongoDB databases, users and collections
