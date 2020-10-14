@@ -5,7 +5,7 @@ services:
  - mongodb
 addons:
   code_climate:
-    repo_token: 'd6589258f9a1e18f8dc6e4c1700d960c00298e1a8618bb9cde99ceaaded49398'
+    repo_token: 25d4b7c087cd2e8ffba443cdfa3726157ec35b90e9e3cffced34268964f8bf4a
 before_script:
   - npm install -g codeclimate-test-reporter
 after_script:
