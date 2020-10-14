@@ -2,7 +2,7 @@
   "name": "feathers-mongodb-management",
   "description": "Feathers service adapters for managing MongoDB databases, collections and users",
   "version": "1.0.0",
-  "homepage": "https://github.com/feathers-plus/feathers-mongodb-management",
+  "homepage": "https://github.com/feathersjs-ecosystem/feathers-mongodb-management",
   "main": "lib/",
   "keywords": [
     "feathers",
@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/feathers-plus/feathers-mongodb-management.git"
+    "url": "git://github.com/feathersjs-ecosystem/feathers-mongodb-management.git"
   },
   "author": {
     "name": "Feathers contributors",
@@ -19,7 +19,7 @@
   },
   "contributors": [],
   "bugs": {
-    "url": "https://github.com/feathers-plus/feathers-mongodb-management/issues"
+    "url": "https://github.com/feathersjs-ecosystem/feathers-mongodb-management/issues"
   },
   "engines": {
     "node": ">= 8.0.0"
@@ -30,7 +30,7 @@
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
-    "changelog": "github_changelog_generator -u feathers-plus -p feathers-mongodb-management && git add CHANGELOG.md && git commit -am \"Updating changelog\"",
+    "changelog": "github_changelog_generator -u feathersjs-ecosystem -p feathers-mongodb-management && git add CHANGELOG.md && git commit -am \"Updating changelog\"",
     "compile": "shx rm -rf lib/ && babel -d lib/ --copy-files src/",
     "watch": "babel --watch -d lib/ --copy-files src/",
     "lint": "semistandard src/**/*.js test/**/*.js --fix",
