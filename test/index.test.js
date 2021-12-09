@@ -2,9 +2,10 @@ import chai, { util, expect } from 'chai';
 import chailint from 'chai-lint';
 import feathers from '@feathersjs/feathers';
 import configuration from '@feathersjs/configuration';
-import MongoClient from 'mongodb';
-import plugin from '../src';
+import { MongoClient } from 'mongodb';
 import makeDebug from 'debug';
+
+import plugin from '../lib/index.js';
 
 const debug = makeDebug('feathers-mongodb-management:tests');
 
@@ -73,19 +74,16 @@ describe('feathers-mongodb-management', () => {
     expect(collectionService).toExist();
   });
 
-  it('creates a collection', (done) => {
-    collectionService.create({
+  it('creates a collection', async () => {
+    const collection = await collectionService.create({
       name: 'test-collection'
-    })
-      .then(collection => {
-        debug(collection);
-        // Need to use strict mode to ensure the delete operation has been taken into account
-        testDb.collection('test-collection', { strict: true }, function (err, collection) {
-          expect(err).beNull();
-          expect(collection).toExist();
-          done();
-        });
-      });
+    });
+
+    debug(collection);
+    // Need to use strict mode to ensure the delete operation has been taken into account
+    const createdCollection = await testDb.collection('test-collection', { strict: true });
+
+    expect(createdCollection).toExist();
   });
 
   it('finds collections', async () => {
@@ -100,16 +98,12 @@ describe('feathers-mongodb-management', () => {
     serviceCollections.forEach(collection => expect(collection.size).beUndefined());
   });
 
-  it('removes a collection', (done) => {
-    collectionService.remove('test-collection')
-      .then(collection => {
-        debug(collection);
-        // Need to use strict mode to ensure the delete operation has been taken into account
-        testDb.collection('test-collection', { strict: true }, function (err, collection) {
-          expect(err).toExist();
-          done();
-        });
-      });
+  it('removes a collection', async () => {
+    const collection = await collectionService.remove('test-collection');
+
+    debug(collection);
+
+    await expect(() => testDb.collection('test-collection', { strict: true })).to.throw();
   });
 
   it('creates the user service', () => {
