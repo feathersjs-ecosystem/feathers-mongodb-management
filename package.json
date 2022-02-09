@@ -36,7 +36,7 @@
     "coverage": "nyc npm run mocha",
     "mongodb": "run-rs -v 4.0.0",
     "test": "npm run lint && npm run coverage",
-    "start": "node example/app"
+    "update-dependencies": "ncu -u"
   },
   "semistandard": {
     "sourceType": "module",
@@ -47,6 +47,15 @@
   "directories": {
     "lib": "lib"
   },
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "lib/**",
+    "types/**",
+    "*.d.ts",
+    "*.js"
+  ],
   "dependencies": {
     "@feathersjs/adapter-commons": "^5.0.0-pre.15",
     "@feathersjs/commons": "^5.0.0-pre.15",
@@ -64,6 +73,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^8.4.1",
     "mocha": "^9.1.3",
+    "npm-check-updates": "^12.3.0",
     "nyc": "^15.1.0",
     "run-rs": "^0.7.5",
     "semistandard": "^16.0.1",

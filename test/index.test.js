@@ -103,7 +103,9 @@ describe('feathers-mongodb-management', () => {
 
     debug(collection);
 
-    await expect(() => testDb.collection('test-collection', { strict: true })).to.throw();
+    const collections = await testDb.collections();
+
+    expect(!collections.includes('test-collection'));
   });
 
   it('creates the user service', () => {
