@@ -1,9 +1,8 @@
 # feathers-mongodb-management
 
-[![Build Status](https://travis-ci.org/feathersjs-ecosystem/feathers-mongodb-management.png?branch=master)](https://travis-ci.org/feathersjs-ecosystem/feathers-mongodb-management)
+[![Build Status](https://app.travis-ci.com/feathersjs-ecosystem/feathers-mongodb-management.png?branch=master)](https://app.travis-ci.com/feathersjs-ecosystem/feathers-mongodb-management)
 [![Code Climate](https://codeclimate.com/github/feathersjs-ecosystem/feathers-mongodb-management/badges/gpa.svg)](https://codeclimate.com/github/feathersjs-ecosystem/feathers-mongodb-management)
 [![Test Coverage](https://codeclimate.com/github/feathersjs-ecosystem/feathers-mongodb-management/badges/coverage.svg)](https://codeclimate.com/github/feathersjs-ecosystem/feathers-mongodb-management/coverage)
-[![Dependency Status](https://img.shields.io/david/feathersjs-ecosystem/feathers-mongodb-management.svg?style=flat-square)](https://david-dm.org/feathersjs-ecosystem/feathers-mongodb-management)
 [![Download Status](https://img.shields.io/npm/dm/feathers-mongodb-management.svg?style=flat-square)](https://www.npmjs.com/package/feathers-mongodb-management)
 
 > Feathers service adapters for managing MongoDB databases, users and collections
