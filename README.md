@@ -11,6 +11,10 @@
 
 With NPM `npm install feathers-mongodb-management --save` or Yarn `yarn add feathers-mongodb-management`
 
+> v1.x is expected to work with Feathers v3 (a.k.a Buzzard) and NodeJS v12
+
+> v2.x is expected to work with Feathers v5 (a.k.a Dove) and NodeJS v16
+
 ## Documentation
 
 If a large number of users require it a more complete feathers-mongodb-management documentation will be created. For now as the API is pretty straigth forward the example and [tests](https://github.com/feathersjs-ecosystem/feathers-mongodb-management/tree/master/test) should be sufficient to understand how it works.
