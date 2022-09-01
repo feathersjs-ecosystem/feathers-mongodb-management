@@ -57,16 +57,16 @@
     "*.js"
   ],
   "dependencies": {
-    "@feathersjs/adapter-commons": "^5.0.0-pre.22",
-    "@feathersjs/commons": "^5.0.0-pre.22",
-    "@feathersjs/errors": "^5.0.0-pre.22",
-    "@feathersjs/feathers": "^5.0.0-pre.22",
+    "@feathersjs/adapter-commons": "^5.0.0-pre.28",
+    "@feathersjs/commons": "^5.0.0-pre.28",
+    "@feathersjs/errors": "^5.0.0-pre.28",
+    "@feathersjs/feathers": "^5.0.0-pre.28",
     "debug": "^4.3.3",
     "mongodb": "^4.2.1",
     "sift": "^15.1.0"
   },
   "devDependencies": {
-    "@feathersjs/configuration": "^5.0.0-pre.22",
+    "@feathersjs/configuration": "^5.0.0-pre.28",
     "c8": "^7.11.0",
     "chai": "^4.3.4",
     "chai-lint": "^0.1.1",
