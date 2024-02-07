@@ -9,8 +9,8 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['16.x'] # ['16.x', '18.x', '20.x']
-        mongodb-version: ['4.4'] # ['4.4', '5.0', '6.0']
+        node-version: ['16.x', '18.x', '20.x'] # ['16.x', '18.x', '20.x']
+        mongodb-version: ['4.4', '5.0', '6.0'] # ['4.4', '5.0', '6.0']
 
     steps:
     - uses: actions/checkout@v2
