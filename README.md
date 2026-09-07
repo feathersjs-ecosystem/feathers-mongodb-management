@@ -7,6 +7,13 @@
 
 > Feathers service adapters for managing MongoDB databases, users and collections
 
+> [!IMPORTANT]
+> This package has moved to the [`feathers-ekosystem`](https://github.com/kalisio/feathers-ekosystem) monorepo.
+>
+> Please use and follow the version maintained in `packages/feathers-mongodb-management` from now on.
+>
+> This repository is no longer maintained.
+
 ## Installation
 
 With NPM `npm install feathers-mongodb-management --save` or Yarn `yarn add feathers-mongodb-management`
